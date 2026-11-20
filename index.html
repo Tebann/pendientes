@@ -18,7 +18,7 @@ h1,h3{margin:0;font-weight:500;letter-spacing:-.02em}
 
 header{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between;margin-bottom:30px}
 h1{font-size:clamp(2.4rem,7vw,4.4rem);line-height:1;font-weight:700}
-#today{margin:10px 0 0;color:var(--mute);text-transform:capitalize}
+#today{margin:10px 0 0;color:var(--mute);}
 .prog{display:grid;gap:8px;justify-items:end;font-size:.9rem;color:var(--mute)}
 .track{width:160px;height:10px;border-radius:99px;background:#1b1b1b;overflow:hidden}
 .track i{display:block;height:100%;width:calc(var(--p,0)*1%);background:#fff;border-radius:99px;transition:width .9s cubic-bezier(.2,.9,.3,1)}
@@ -43,8 +43,8 @@ h1{font-size:clamp(2.4rem,7vw,4.4rem);line-height:1;font-weight:700}
 .tile p{margin:4px 0 0;font-size:.9rem;line-height:1.35;opacity:.75;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .base{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;gap:8px}
 .base .ic{width:52px;height:52px;color:#000;transition:transform .5s var(--spring)}
-.tile:hover{transform:translateY(-6px) rotate(-1.2deg)}
-.tile:hover .base .ic{transform:rotate(14deg) scale(1.12)}
+@media(hover:hover){.tile:hover{transform:translateY(-6px) rotate(-1.2deg)}
+.tile:hover .base .ic{transform:rotate(14deg) scale(1.12)}}
 .tile:active{transform:scale(.96)}
 .cd{display:flex;align-items:center;gap:6px;font-weight:700;font-size:.95rem}
 .cd.hot{background:#000;color:var(--c);padding:5px 13px;border-radius:99px;animation:beat 2s infinite}
@@ -166,6 +166,29 @@ dialog{max-height:calc(100dvh - 24px)}
 .wide{width:100%}
 .lnk{background:none;border:0;padding:0;text-decoration:underline;cursor:pointer;font-weight:500;justify-self:start;font-size:.9rem}
 #aErr{min-height:1.2em;font-weight:500;font-size:.9rem}
+button,.tile,.chip{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.chips{display:contents}
+.fbtn{display:none;align-items:center;gap:8px;padding:10px 16px 10px 12px;border-radius:18px;border:1.5px solid var(--line);background:#0d0d0d;color:#ddd;font-weight:500;cursor:pointer;white-space:nowrap}
+.fbtn svg{width:18px;height:18px}
+.fbtn i{width:10px;height:10px;border-radius:50%}
+.fbtn[aria-expanded=true]{background:#fff;color:#000;border-color:#fff}
+@media(max-width:640px){
+  .wrap{padding:20px 14px 40px}
+  header{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;margin-bottom:16px}
+  .hello,.prog{display:contents}
+  h1{font-size:1.9rem;grid-area:1/1}
+  .acct{grid-area:1/2;padding:6px 12px;font-size:.85rem}
+  #today{grid-area:2/1/3/3;margin:0;font-size:.9rem}
+  #progtxt{grid-area:3/1/4/3;font-size:.85rem;margin-top:6px}
+  .track{grid-area:4/1/5/3;width:100%;height:6px}
+  .tools{gap:8px;margin-bottom:16px}
+  .fbtn{display:inline-flex;order:1}
+  .search{order:2;flex:1 1 0;min-width:0;margin-left:0;padding:11px 16px;border-radius:18px}
+  .chips{order:3;flex:1 1 100%;display:flex;flex-wrap:wrap;gap:8px;max-height:0;overflow:hidden;opacity:0;visibility:hidden;transition:max-height .4s cubic-bezier(.2,.9,.3,1),opacity .25s,visibility 0s .4s}
+  .tools.open .chips{max-height:420px;opacity:1;visibility:visible;transition:max-height .4s cubic-bezier(.2,.9,.3,1),opacity .25s,visibility 0s}
+  .chip{padding:6px 12px 6px 9px;font-size:.9rem}
+  .cd{font-size:.85rem}
+}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -176,8 +199,9 @@ dialog{max-height:calc(100dvh - 24px)}
     <div class="prog"><button class="acct" id="acct" hidden>Iniciar sesión</button><span id="progtxt"></span><div class="track"><i id="fill"></i></div></div>
   </header>
 
-  <div class="tools">
-    <div id="chips" style="display:contents"></div>
+  <div class="tools" id="tools">
+    <button class="fbtn" id="ftog" type="button" aria-expanded="false" aria-controls="chips">Filtros</button>
+    <div id="chips" class="chips"></div>
     <input class="search" id="q" type="search" placeholder="Buscar" aria-label="Buscar pendientes">
   </div>
 
@@ -252,16 +276,11 @@ dialog{max-height:calc(100dvh - 24px)}
   </form>
 </dialog>
 
-<!-- ===== SINCRONIZACIÓN: pega aquí los datos de tu proyecto de Firebase ===== -->
+<!-- Tus datos de Firebase van en el archivo firebase-config.js (junto a este index.html). -->
+<script src="firebase-config.js"></script>
 <script>
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDvFbGhci4H3LFgTLeCGt0jEqTeCEpNkvw",
-  authDomain: "mis-pendientes-54f6c.firebaseapp.com",
-  projectId: "mis-pendientes-54f6c",
-  storageBucket: "mis-pendientes-54f6c.firebasestorage.app",
-  messagingSenderId: "450186382828",
-  appId: "1:450186382828:web:f5f3fc02949e79d0eac4c9"
-};
+/* Alternativa: si no usas firebase-config.js, pega tus datos aquí. */
+window.FIREBASE_CONFIG = window.FIREBASE_CONFIG || { apiKey: "", authDomain: "", projectId: "", appId: "" };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 <script>
@@ -282,6 +301,7 @@ const P = {
 const ic = k => `<svg class="ic" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[k] || P.otr}</svg>`;
 const LOCAL = Object.keys(P), IKEY = 'pendientes.icons.v1';
 try { Object.assign(P, JSON.parse(localStorage.getItem(IKEY)) || {}); } catch (e) {}
+const FSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h8M18 7h2M4 17h2M12 17h8"/><circle cx="15" cy="7" r="2.6"/><circle cx="9" cy="17" r="2.6"/></svg>';
 const DEF = {
   uni: {n:'Universidad', c:'#A8C4E8', i:'uni'}, dis: {n:'Diseño', c:'#F0C4DD', i:'dis'},
   lib: {n:'Lectura', c:'#FF7B4D', i:'lib'}, per: {n:'Personal', c:'#F2EC6B', i:'per'},
@@ -299,7 +319,7 @@ const plus = n => { const d = new Date(); d.setDate(d.getDate()+n); return iso(d
 const midnight = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
 const days = s => { const [y,m,d] = s.split('-').map(Number); return Math.round((new Date(y,m-1,d) - midnight()) / 864e5); };
 const fmt = s => { const [y,m,d] = s.split('-').map(Number);
-  return new Date(y,m-1,d).toLocaleDateString('es-CO', {weekday:'short', day:'numeric', month:'short'}); };
+  return new Date(y,m-1,d).toLocaleDateString('es-CO', {weekday:'short', day:'numeric', month:'short'}).replace(/[.,]/g, '').replace(/ de /g, ' '); };
 const countdown = d => d < 0 ? `Hace ${-d} ${d === -1 ? 'día' : 'días'}` : d === 0 ? 'Hoy' : d === 1 ? 'Mañana' : `${d} días`;
 
 function seed() {
@@ -336,7 +356,8 @@ function tile(t, i) {
 
 function render() {
   if (filter !== 'all' && !CATS[filter]) filter = 'all';
-  $('today').textContent = new Date().toLocaleDateString('es-CO', {weekday:'long', day:'numeric', month:'long'});
+  const dt = new Date().toLocaleDateString('es-CO', {weekday:'long', day:'numeric', month:'long'});
+  $('today').textContent = dt.charAt(0).toUpperCase() + dt.slice(1);
   const total = tasks.length, done = tasks.filter(t => t.done).length;
   const soon = tasks.filter(t => !t.done && t.date && days(t.date) <= 7).length;
   $('fill').style.setProperty('--p', total ? done / total * 100 : 0);
@@ -348,6 +369,8 @@ function render() {
       `<button class="chip" data-f="${k}" aria-pressed="${filter === k}" style="--c:${v.c}">${ic(v.i)}${esc(v.n)} <em>${tasks.filter(t => t.cat === k && !t.done).length}</em></button>`).join('') +
     `<button class="chip" data-d="1" aria-pressed="${showDone}" style="--c:#fff">Listos <em>${tasks.filter(t => t.done).length}</em></button><button class="chip ghost" id="mng" style="--c:#fff">Editar tipos</button>`;
 
+  const fa = filter !== 'all' ? gc(filter) : null;
+  $('ftog').innerHTML = FSVG + (fa ? esc(fa.n) + `<i style="background:${fa.c}"></i>` : 'Filtros');
   const term = q.trim().toLowerCase();
   const vis = tasks.filter(t => (filter === 'all' || t.cat === filter) && (showDone || !t.done) && (!term || (t.title + ' ' + t.desc).toLowerCase().includes(term)));
 
@@ -769,13 +792,13 @@ async function logout() {
   $('adlg').close(); acctUI(); render();
 }
 async function initCloud() {
-  if (!FIREBASE_CONFIG.apiKey) return;
+  const CFG = window.FIREBASE_CONFIG; if (!CFG || !CFG.apiKey) return;
   $('acct').hidden = false;
   try {
     const base = 'https://www.gstatic.com/firebasejs/10.14.1/';
     await loadJs(base + 'firebase-app-compat.js');
     await Promise.all([loadJs(base + 'firebase-auth-compat.js'), loadJs(base + 'firebase-firestore-compat.js')]);
-    firebase.initializeApp(FIREBASE_CONFIG);
+    firebase.initializeApp(CFG);
     fb = {auth: firebase.auth(), db: firebase.firestore()};
     fb.auth.onAuthStateChanged(onUser);
   } catch (e) {}
@@ -809,6 +832,14 @@ $('aOutBtn').onclick = logout;
 $('adlg').addEventListener('click', e => { if (e.target === $('adlg')) $('adlg').close(); });
 addEventListener('online', () => { if (user && synced) { if (isDirty()) push(); else acctUI('ok'); } });
 addEventListener('offline', () => { if (user) acctUI('offline'); });
+
+/* ---------- Filtros escondidos en el celular ---------- */
+const closeFilters = () => { $('tools').classList.remove('open'); $('ftog').setAttribute('aria-expanded', 'false'); };
+$('ftog').addEventListener('click', () => {
+  const open = !$('tools').classList.contains('open');
+  $('tools').classList.toggle('open', open); $('ftog').setAttribute('aria-expanded', String(open));
+});
+$('chips').addEventListener('click', e => { if (e.target.closest('.chip')) closeFilters(); });
 
 render();
 initCloud();
